@@ -1,0 +1,94 @@
+/* Общие стили */
+body {
+    background-color: black;
+    color: beige;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Заголовок */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+header img {
+    height: 50px;
+    margin-right: 10px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+header a {
+    text-decoration: none;
+    color: beige;
+}
+
+header a img {
+    height: 24px;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+}
+
+/* Основной контент */
+main {
+    padding: 20px;
+}
+
+.upload-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.upload-section label {
+    display: inline-block;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.upload-section label:hover {
+    background-color: #347a3c;
+}
+
+.upload-section input[type="file"] {
+    display: none; /* Скрываем стандартное поле выбора файла */
+}
+
+/* Галерея */
+.gallery-section {
+    margin-top: 20px;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 50px;
+}
+
+.gallery img {
+    width: 200px;    /* Устанавливает фиксированную ширину */
+    height: 250px;   /* Устанавливает фиксированную высоту */
+    object-fit: cover; /* Масштабирует изображение, сохраняя его пропорции */
+    border-radius: 5px;
+    border: 2px solid #444;
+    transition: transform 0.3s;
+}
+
+.gallery img:hover {
+    transform: scale(1.05);
+    border-color: #fff;
+}
