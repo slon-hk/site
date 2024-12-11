@@ -1,8 +1,8 @@
-from flask import Flask, request, jsonify, send_from_directory, render_template
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session, send_from_directory
+from flask_cors import CORS
 import os
 import uuid
-from flask_cors import CORS
+from database import db, bcrypt, User, Image, init_app
 
 # Настройки Flask
 app = Flask(__name__)
@@ -12,18 +12,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 CORS(app, resources={r"/*": {"origins": "*"}})
+
 # Инициализация базы данных
-db = SQLAlchemy(app)
-
-# Модель базы данных для хранения изображений
-class Image(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    filename = db.Column(db.String(100), nullable=False)
-    url = db.Column(db.String(200), nullable=False)
-
-# Создание базы данных
-with app.app_context():
-    db.create_all()
+init_app(app)
 
 # Проверка допустимых файлов
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -31,12 +22,14 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Главная страница
+# Главная страница (защищена авторизацией)
 @app.route('/')
 def home():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
     return render_template('index.html')
 
-# Маршрут для получения галереи
+# Маршрут для загрузки изображений
 @app.route('/gallery', methods=['GET'])
 def get_gallery():
     images = Image.query.all()
@@ -44,12 +37,48 @@ def get_gallery():
     for image in images:
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], image.filename)
         if os.path.exists(file_path):
-            image_urls.append(image.url)
+            image_urls.append(url_for('serve_uploaded_file', filename=image.filename))
         else:
-            # Если файл отсутствует, удаляем запись из базы данных
             db.session.delete(image)
     db.session.commit()
-    return jsonify(image_urls)
+
+    return jsonify(image_urls), 200
+
+# Маршрут для отдачи файлов
+@app.route('/uploads/<filename>')
+def serve_uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+# Страница логина
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = User.query.filter_by(username=username).first()
+        if user and bcrypt.check_password_hash(user.password, password):
+            session['user_id'] = user.id
+            return redirect(url_for('home'))
+        return render_template('login.html', error='Неправильный логин или пароль')
+    return render_template('login.html')
+
+# Страница регистрации
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+        if User.query.filter_by(username=username).first():
+            return render_template('register.html', error='Пользователь уже существует')
+
+        new_user = User(username=username, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+        session['user_id'] = new_user.id
+        return redirect(url_for('home'))
+    return render_template('register.html')
 
 # Маршрут для загрузки изображения
 @app.route('/upload', methods=['POST'])
@@ -80,10 +109,11 @@ def upload_image():
 
     return jsonify({'error': 'Invalid file type'}), 400
 
-# Маршрут для отдачи загруженных файлов
-@app.route('/uploads/<filename>')
-def serve_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+# Маршрут для выхода
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    return redirect(url_for('login'))
 
 # Запуск приложения
 if __name__ == '__main__':

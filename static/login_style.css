@@ -1,0 +1,75 @@
+body {
+    background-color: black;
+    color: beige;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex; /* Включаем Flexbox */
+    justify-content: center; /* Горизонтальное выравнивание */
+    align-items: center; /* Вертикальное выравнивание */
+    height: 100vh; /* Высота на весь экран */
+}
+
+.main_part {
+    display: inline-block;
+    text-align: center;
+    background-color: rgba(155, 155, 155, 0.381);
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Добавляем небольшую тень */
+}
+
+
+img {
+    height: 250px;
+}
+
+.main_part image{
+    align-items: center;
+}
+.main_part h2{
+    align-items: center;
+    padding: 10px;
+}
+
+#username{
+    margin: 20px;
+    border-radius: 15px;
+    border: 0px;
+    padding: 10px;
+    padding-left: 30px;
+    padding-right: 30PX;
+}
+
+#username:hover{
+    background-color: rgb(185, 185, 185);
+}
+
+#password{
+    margin: 20px;
+    border-radius: 15px;
+    border: 0px;
+    padding: 10px;
+    padding-left: 30px;
+    padding-right: 30PX;
+    margin: 20px;
+    margin-top: 0px;
+}
+#password:hover{
+    background-color: rgb(185, 185, 185);
+}
+
+button {
+    background-color: #4CAF50;
+    border: 0px;
+    border-radius: 15px;
+    padding: 10px;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+button:hover{
+    background-color: #347a3c;
+}
+
+a{
+    color: brown;
+}

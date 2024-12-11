@@ -15,7 +15,7 @@ header {
 }
 
 header img {
-    height: 50px;
+    height: 100px;
     margin-right: 10px;
 }
 
@@ -65,7 +65,7 @@ main {
 }
 
 .upload-section input[type="file"] {
-    display: none; /* Скрываем стандартное поле выбора файла */
+    display: none;
 }
 
 /* Галерея */

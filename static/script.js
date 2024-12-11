@@ -2,14 +2,21 @@ const serverUrl = "http://127.0.0.1:2000";
 
 function loadGallery() {
     fetch(`${serverUrl}/gallery`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(images => {
             const gallery = document.getElementById("gallery");
             gallery.innerHTML = "";
             images.forEach(src => {
                 const img = document.createElement("img");
-                img.src = `${serverUrl}${src}`;
+                img.src = src; // URL уже содержит полный путь
                 img.alt = "Image";
+                img.style.maxWidth = "200px";
+                img.style.margin = "10px";
                 gallery.appendChild(img);
             });
         })
